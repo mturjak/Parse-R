@@ -8,9 +8,9 @@
 # list of required packages
 req.packages <- c(
 
-		"utils", 			# URLencode()
-		"RCurl",			# getURL()
-		"jsonlite"		# toJSON() and fromJSON()
+	"utils", 	# URLencode()
+	"RCurl",	# getURL()
+	"jsonlite"	# toJSON() and fromJSON()
 
 )
 
@@ -27,46 +27,46 @@ invisible(lapply(req.packages, library, ch=T))
 ##
 # helper function for calling getURL{RCurl}
 parseCurlHelper <- function(objectURI = "users", customrequest = "GET", httpheader = NULL, body = NULL, verbose = FALSE) {
-		args <- list(
-				paste(PARSE_API_URL,objectURI, sep=""),
-				httpheader = c(
-						"X-Parse-Application-Id" = APP_ID,
-						"X-Parse-REST-API-Key" = REST_API_KEY,
-						httpheader),
-				customrequest = customrequest,
-				verbose = verbose
+	args <- list(
+		paste(PARSE_API_URL,objectURI, sep=""),
+		httpheader = c(
+			"X-Parse-Application-Id" = APP_ID,
+			"X-Parse-REST-API-Key" = REST_API_KEY,
+			httpheader),
+		customrequest = customrequest,
+		verbose = verbose
+	)
+	if(!is.null(body)) {
+		args <- c(args, postfields = body)
+	}
+	return(
+		fromJSON(
+			tryCatch(
+				do.call(getURL, args),
+				error = function(e) paste("{\"error\" : \"", gsub("([.])|[^[:alnum:] ]", "\\1", toString(e)), "\"}")
+			)
 		)
-		if(!is.null(body)) {
-			args <- c(args, postfields = body)
-		}
-		return(
-				fromJSON(
-						tryCatch(
-								do.call(getURL, args),
-								error = function(e) paste("{\"error\" : \"", gsub("([.])|[^[:alnum:] ]", "\\1", toString(e)), "\"}")
-						)
-				)
-		)
+	)
 }
 
 uploadHelper <- function(fileName, verbose = FALSE) {
-		args <- list(
-			  uri = paste(PARSE_API_URL,"files/",fileName, sep=""),
-				httpheader = c(
-						"X-Parse-Application-Id" = APP_ID,
-						"X-Parse-REST-API-Key" = REST_API_KEY),
-				customrequest = "DELETE",
-				verbose = verbose,
-				postfields = data
+	args <- list(
+		  uri = paste(PARSE_API_URL,"files/",fileName, sep=""),
+			httpheader = c(
+				"X-Parse-Application-Id" = APP_ID,
+				"X-Parse-REST-API-Key" = REST_API_KEY),
+			customrequest = "DELETE",
+			verbose = verbose,
+			postfields = data
+	)
+	return(
+		fromJSON(
+			tryCatch(
+				do.call(getURL, args),
+				error = function(e) paste("{\"error\" : \"", gsub("([.])|[^[:alnum:] ]", "\\1", toString(e)), "\"}")
+			)
 		)
-		return(
-				fromJSON(
-						tryCatch(
-							  do.call(getURL, args),
-								error = function(e) paste("{\"error\" : \"", gsub("([.])|[^[:alnum:] ]", "\\1", toString(e)), "\"}")
-						)
-				)
-		)
+	)
 }
 
 ##
